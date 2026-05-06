@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: diplom_web
+    restart: always
+    command: >
+      sh -c "python manage.py migrate && 
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --timeout 600"
+    env_file:
+      - .env
+    ports:
+      - "8003:8000"
+    labels:
+      - "logging=promtail"
+    depends_on:
+      - db_diplom
+    networks:
+      - backend-net
+
+  db_diplom:
+    image: postgres:16
+    container_name: db_diplom
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+    ports:
+      - "5435:5432"
+    networks:
+      - backend-net
+
+volumes:
+  postgres_data:
+
+networks:
+  backend-net:
+    driver: bridge
