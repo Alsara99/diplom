@@ -23,7 +23,7 @@ class WorkerSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "state",
+            "role",
             "active_tasks",
             "active_tasks_count",
         ]
